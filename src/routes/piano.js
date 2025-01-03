@@ -35,21 +35,30 @@ export function create_sampler(Tone) {
 		release: 1,
 		baseUrl: "https://tonejs.github.io/audio/salamander/",
 	}).toDestination();
-	return {
+	let active_notes = new Map();
+	let obj = {
 		sampler,
 		async play(note) {
 			try {
 				if (Tone.context.state === 'suspended') await Tone.context.resume();
-				sampler.releaseAll();
+				await this.stop(note);
 				sampler.triggerAttack(note);
-				setTimeout(() => sampler.triggerRelease(note), 15_000)
+				active_notes.set(note, setTimeout(() => this.stop(note), 15_000));
 			} catch { }
 		},
 		async stop(note) {
 			try {
 				if (Tone.context.state === 'suspended') await Tone.context.resume();
-				sampler.triggerRelease(note);
+				if (active_notes.has(note)) {
+					let timeout = active_notes.get(note);
+					if (timeout) clearTimeout(timeout);
+					sampler.triggerRelease(note);
+					active_notes.delete(note);
+				}
 			} catch { }
 		}
 	}
+	obj.play = obj.play.bind(obj);
+	obj.stop = obj.stop.bind(obj);
+	return obj;
 }

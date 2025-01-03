@@ -22,8 +22,12 @@
 	} from "./draw.js";
 	import { point_inside_polygon } from "./math.js";
 	import { create_sampler } from "./piano.js";
+	import { create_logger } from "./logger.js";
 
-	let sampler, play, stop;
+	const logger = create_logger();
+	logger.on = true;
+
+	let play, stop;
 
 	let octave_shift = $state(0);
 	let show_text = $state(false);
@@ -172,7 +176,7 @@
 			while (id--) window.cancelAnimationFrame(id);
 		}
 		cancel_all_animation_frames();
-		({ sampler, play, stop } = create_sampler(Tone));
+		({ play, stop } = create_sampler(Tone));
 		const ctx = canvas.getContext("2d");
 		ctx.imageSmoothingEnabled = true;
 		let frame;
@@ -185,12 +189,15 @@
 			let k = n_low_white;
 			for (let r = 0; r < rows; r++) {
 				let x = 0;
+				logger.log({ r, x });
 				for (
 					let i = 0, w = 0;
 					w < white_keys_per_row && k <= n_high_white;
 					i++
 				) {
+					logger.log({ i, k });
 					if (number_is_natural(k)) {
+						logger.log("Natural");
 						w++;
 						let letter = number_to_letter(k);
 						let note = number_to_note(k);
@@ -293,6 +300,7 @@
 				}
 				y += canvas.height / rows;
 			}
+			logger.off();
 			frame = requestAnimationFrame(draw);
 		}
 		draw();
