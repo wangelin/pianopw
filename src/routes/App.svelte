@@ -1,6 +1,7 @@
 <script>
 	import * as Tone from "tone";
 	import { onMount } from "svelte";
+	import { SvelteMap } from "svelte/reactivity";
 	import {
 		number_to_note,
 		note_to_number,
@@ -47,7 +48,7 @@
 	let canvas = $state();
 
 	let status = $state("");
-	let playing_notes = $state(new Map());
+	let playing_notes = $state(new SvelteMap());
 	let hand_held = $state();
 
 	function onpointerup(event) {
@@ -122,12 +123,12 @@
 	};
 
 	async function onpointerdown(event) {
+		if (event.target !== canvas) {
+			return;
+		}
 		if (onpointerdownonce) {
 			await onpointerdownonce();
 		}
-		try {
-			sampler.releaseAll();
-		} catch {}
 		const rect = canvas.getBoundingClientRect();
 		const x = event.clientX - rect.left;
 		const y = event.clientY - rect.top;
@@ -146,6 +147,7 @@
 	}
 
 	function onpointermove(event) {
+		if (!playing_notes.get(event.pointerId)) return;
 		const rect = canvas.getBoundingClientRect();
 		const x = event.clientX - rect.left;
 		const y = event.clientY - rect.top;
@@ -173,13 +175,12 @@
 		ctx.imageSmoothingEnabled = true;
 		let frame;
 
-		function loop() {
+		function draw() {
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 			let key_width = canvas.width / white_keys_per_row;
 			let y = 0;
 			let k = n_low_white;
-			let text = true;
 			for (let r = 0; r < rows; r++) {
 				let x = 0;
 				for (
@@ -207,7 +208,7 @@
 								canvas.height / rows,
 								{ text: show_text ? note : "" },
 							);
-							playing_notes.entries().forEach(([key, value]) => {
+							playing_notes.values().forEach((value) => {
 								if (value !== note) return;
 								draw_black_key(
 									ctx,
@@ -246,7 +247,7 @@
 								{ fillStyle: "rgba(0, 0, 0, 20%)" },
 							);
 						}
-						playing_notes.entries().forEach(([key, value]) => {
+						playing_notes.values().forEach((value) => {
 							if (value !== note) return;
 							draw_white_key(
 								ctx,
@@ -272,7 +273,7 @@
 								canvas.height / rows,
 								{ text: show_text ? note : "" },
 							);
-							playing_notes.entries().forEach(([key, value]) => {
+							playing_notes.values().forEach((value) => {
 								if (value !== note) return;
 								draw_black_key(
 									ctx,
@@ -290,9 +291,9 @@
 				}
 				y += canvas.height / rows;
 			}
-			frame = requestAnimationFrame(loop);
+			frame = requestAnimationFrame(draw);
 		}
-		loop();
+		draw();
 
 		return () => {
 			cancelAnimationFrame(frame);
@@ -300,10 +301,7 @@
 	});
 </script>
 
-<svelte:window
-	onpointerup={playing_notes.size > 0 ? onpointerup : undefined}
-	onpointermove={playing_notes.size > 0 ? onpointermove : undefined}
-/>
+<svelte:window {onpointerdown} {onpointerup} {onpointermove} />
 
 <div class="screen">
 	<div class="canvas-container">
@@ -311,7 +309,6 @@
 			bind:this={canvas}
 			width={(number_of_white_keys * 23 * 4) / rows}
 			height={rows * 150 * 4}
-			{onpointerdown}
 			style:background-color="transparent"
 		></canvas>
 	</div>
