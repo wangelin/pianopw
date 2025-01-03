@@ -217,8 +217,8 @@
 								canvas.height / rows,
 								{ text: show_text ? note : "" },
 							);
-							playing_notes.values().forEach((value) => {
-								if (value !== note) return;
+							for (const value of playing_notes.values()) {
+								if (value !== note) continue;
 								draw_black_key(
 									ctx,
 									letter,
@@ -228,7 +228,7 @@
 									canvas.height / rows,
 									{ fillStyle: "rgba(255,255,255,0.2)" },
 								);
-							});
+							}
 						}
 						if (k === n_low_white) letter += "0";
 						else if (k === n_high_white) letter += "1";
@@ -258,8 +258,8 @@
 						}
 						logger.log("Checking playing_notes");
 						logger.log(JSON.stringify([...playing_notes.values()]));
-						playing_notes.values().forEach((value) => {
-							if (value !== note) return;
+						for (const value of playing_notes.values()) {
+							if (value !== note) continue;
 							draw_white_key(
 								ctx,
 								letter,
@@ -269,7 +269,7 @@
 								canvas.height / rows,
 								{ fillStyle: "rgba(0, 0, 0, 10%)" },
 							);
-						});
+						}
 						logger.log("done checking playing_notes");
 						x += key_width;
 						k++;
@@ -285,8 +285,8 @@
 								canvas.height / rows,
 								{ text: show_text ? note : "" },
 							);
-							playing_notes.values().forEach((value) => {
-								if (value !== note) return;
+							for (const value of playing_notes.values()) {
+								if (value !== note) continue;
 								draw_black_key(
 									ctx,
 									letter,
@@ -296,7 +296,7 @@
 									canvas.height / rows,
 									{ fillStyle: "rgba(255,255,255,0.2)" },
 								);
-							});
+							}
 							k++;
 						}
 					}
