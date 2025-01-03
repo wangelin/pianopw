@@ -1,9 +1,6 @@
-import { create_logger } from "./logger.js";
-
-const logger = create_logger()
+// import { create_logger } from "./logger.js";
 
 export function draw_shape(ctx, width, height, x, y, moves) {
-	logger.log("draw_shape");
 	if (moves.length < 1) return;
 	ctx.beginPath();
 	let move = moves[0];
@@ -29,7 +26,6 @@ black_key_shapes.Gb = black_key_shapes.G;
 black_key_shapes.Ab = black_key_shapes.A;
 
 export function draw_black_key(ctx, shape, x, y, width, height, options) {
-	logger.log("draw_black_key");
 	if (!shape in black_key_shapes) throw "Invalid shape!"
 	ctx.fillStyle = options?.fillStyle ?? 'black';
 	ctx.strokeStyle = options?.strokeStyle ?? 'black';
@@ -73,11 +69,9 @@ export const white_key_shapes = {
 }
 
 export function draw_white_key(ctx, shape, x, y, width, height, options) {
-	logger.log("draw_white_key");
-	logger.log(JSON.stringify({ ctx, shape, x, y, width, height, options }))
 	if (!shape in white_key_shapes) throw "Invalid shape!"
-	ctx.fillStyle = options?.fillStyle ?? 'white';
 	ctx.strokeStyle = options?.strokeStyle ?? 'black';
+	ctx.fillStyle = options?.fillStyle ?? 'white';
 
 	draw_shape(ctx, width, height, x, y, white_key_shapes[shape]);
 

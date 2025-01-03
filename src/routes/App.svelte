@@ -22,10 +22,7 @@
 	} from "./draw.js";
 	import { point_inside_polygon } from "./math.js";
 	import { create_sampler } from "./piano.js";
-	import { create_logger } from "./logger.js";
-
-	const logger = create_logger();
-	logger.on = true;
+	// import { create_logger } from "./logger.js";
 
 	let play, stop;
 
@@ -137,17 +134,17 @@
 		const rect = canvas.getBoundingClientRect();
 		const x = event.clientX - rect.left;
 		const y = event.clientY - rect.top;
-		let current_note = get_note(rect, x, y);
+		let current_note = shift(get_note(rect, x, y), octave_shift);
 		if (sustain) {
 			if (playing_notes.get(event.pointerId) === current_note) {
 				playing_notes.set(event.pointerId, "");
 			} else {
 				playing_notes.set(event.pointerId, current_note);
-				play(shift(current_note, octave_shift));
+				play(current_note);
 			}
 		} else {
 			playing_notes.set(event.pointerId, current_note);
-			play(shift(current_note, octave_shift));
+			play(current_note);
 		}
 	}
 
@@ -158,13 +155,13 @@
 		const x = event.clientX - rect.left;
 		const y = event.clientY - rect.top;
 
-		let current_note = get_note(rect, x, y);
+		let current_note = shift(get_note(rect, x, y), octave_shift);
 		if (
 			current_note &&
 			current_note !== playing_notes.get(event.pointerId)
 		) {
 			playing_notes.set(event.pointerId, current_note);
-			play(shift(current_note, octave_shift));
+			play(current_note);
 		}
 	}
 
@@ -189,15 +186,12 @@
 			let k = n_low_white;
 			for (let r = 0; r < rows; r++) {
 				let x = 0;
-				logger.log(JSON.stringify({ r, x }));
 				for (
 					let i = 0, w = 0;
 					w < white_keys_per_row && k <= n_high_white;
 					i++
 				) {
-					logger.log(JSON.stringify({ i, k }));
 					if (number_is_natural(k)) {
-						logger.log("Natural");
 						w++;
 						let letter = number_to_letter(k);
 						let note = number_to_note(k);
@@ -256,8 +250,6 @@
 								{ fillStyle: "rgba(0, 0, 0, 20%)" },
 							);
 						}
-						logger.log("Checking playing_notes");
-						logger.log(JSON.stringify([...playing_notes.values()]));
 						for (const value of playing_notes.values()) {
 							if (value !== note) continue;
 							draw_white_key(
@@ -270,7 +262,6 @@
 								{ fillStyle: "rgba(0, 0, 0, 10%)" },
 							);
 						}
-						logger.log("done checking playing_notes");
 						x += key_width;
 						k++;
 						if (k < n_high_white && number_is_flat_or_sharp(k)) {
@@ -300,11 +291,9 @@
 							k++;
 						}
 					}
-					logger.log(JSON.stringify({ k }));
 				}
 				y += canvas.height / rows;
 			}
-			logger.off();
 			frame = requestAnimationFrame(draw);
 		}
 		draw();
