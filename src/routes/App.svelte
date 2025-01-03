@@ -189,13 +189,13 @@
 			let k = n_low_white;
 			for (let r = 0; r < rows; r++) {
 				let x = 0;
-				logger.log({ r, x });
+				logger.log(JSON.stringify({ r, x }));
 				for (
 					let i = 0, w = 0;
 					w < white_keys_per_row && k <= n_high_white;
 					i++
 				) {
-					logger.log({ i, k });
+					logger.log(JSON.stringify({ i, k }));
 					if (number_is_natural(k)) {
 						logger.log("Natural");
 						w++;
@@ -297,6 +297,7 @@
 							k++;
 						}
 					}
+					logger.log(JSON.stringify({ k }));
 				}
 				y += canvas.height / rows;
 			}
