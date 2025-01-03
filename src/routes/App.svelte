@@ -480,6 +480,7 @@
 		max-width: 100%;
 		flex: 1;
 		min-width: 0;
+		touch-action: none;
 	}
 	button {
 		background-color: #222;
