@@ -48,6 +48,9 @@
 
 	let status = $state("");
 	let playing_note = $state("");
+	let hand_held = $state();
+	let vh = $state();
+
 	let timeout;
 	$effect(() => {
 		try {
@@ -134,9 +137,7 @@
 	let onpointerdownonce = async () => {
 		try {
 			await Tone.start();
-		} catch (error) {
-			status = error.message;
-		}
+		} catch {}
 		onpointerdownonce = undefined;
 	};
 
@@ -179,6 +180,8 @@
 	}
 
 	onMount(() => {
+		hand_held = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+
 		function cancel_all_animation_frames() {
 			let id = window.requestAnimationFrame(function () {});
 			while (id--) window.cancelAnimationFrame(id);
@@ -316,9 +319,12 @@
 <svelte:window
 	onpointerup={playing_note ? onpointerup : undefined}
 	onpointermove={pointerdown ? onpointermove : undefined}
+	onresize={() => {
+		vh = window.innerHeight * 0.01;
+	}}
 />
 
-<div class="screen">
+<div class="screen" style="--vh: {vh}px;">
 	<div class="canvas-container">
 		<canvas
 			bind:this={canvas}
@@ -328,7 +334,10 @@
 			style:background-color="transparent"
 		></canvas>
 	</div>
-	<div class="controls row">
+	<div
+		class="controls row"
+		style:padding-bottom={hand_held ? "1em" : undefined}
+	>
 		<div class="col">
 			<span style:font-size="small" style:text-align="center">Keys</span>
 			<div class="row">
@@ -471,7 +480,8 @@
 	div.screen {
 		display: grid;
 		grid-template-rows: 1fr auto;
-		height: 100%;
+		min-height: 100vh;
+		height: var(--vh, 100vh);
 		width: 100%;
 		overflow: hidden;
 	}

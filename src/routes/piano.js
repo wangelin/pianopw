@@ -1,4 +1,4 @@
-export function create_sampler (Tone) {
+export function create_sampler(Tone) {
 	let sampler = new Tone.Sampler({
 		urls: {
 			A0: "A0.mp3",
@@ -37,9 +37,12 @@ export function create_sampler (Tone) {
 	}).toDestination();
 	return {
 		sampler,
-		play (note) {
-			sampler.releaseAll()
-			sampler.triggerAttack(note)
+		async play(note) {
+			try {
+				if (Tone.context.state === 'suspended') await Tone.context.resume();
+				sampler.releaseAll();
+				sampler.triggerAttack(note);
+			} catch { }
 		}
 	}
 }
