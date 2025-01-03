@@ -3,6 +3,7 @@ import { create_logger } from "./logger.js";
 const logger = create_logger()
 
 export function draw_shape(ctx, width, height, x, y, moves) {
+	logger.log("draw_shape");
 	if (moves.length < 1) return;
 	ctx.beginPath();
 	let move = moves[0];
@@ -73,6 +74,7 @@ export const white_key_shapes = {
 
 export function draw_white_key(ctx, shape, x, y, width, height, options) {
 	logger.log("draw_white_key");
+	logger.log(JSON.stringify({ ctx, shape, x, y, width, height, options }))
 	if (!shape in white_key_shapes) throw "Invalid shape!"
 	ctx.fillStyle = options?.fillStyle ?? 'white';
 	ctx.strokeStyle = options?.strokeStyle ?? 'black';
