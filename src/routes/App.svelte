@@ -256,6 +256,8 @@
 								{ fillStyle: "rgba(0, 0, 0, 20%)" },
 							);
 						}
+						logger.log("Checking playing_notes");
+						logger.log(JSON.stringify([...playing_notes.values()]));
 						playing_notes.values().forEach((value) => {
 							if (value !== note) return;
 							draw_white_key(
@@ -268,6 +270,7 @@
 								{ fillStyle: "rgba(0, 0, 0, 10%)" },
 							);
 						});
+						logger.log("done checking playing_notes");
 						x += key_width;
 						k++;
 						if (k < n_high_white && number_is_flat_or_sharp(k)) {
