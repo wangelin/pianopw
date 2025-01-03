@@ -1,9 +1,9 @@
 import { matches } from "./math.js"
 
-export function number_to_note (num, sharp) {
+export function number_to_note(num, sharp) {
 	if (num < 0) throw "Invalid argument";
 	if (num > 87) throw "Invalid argument";
-	
+
 	let note;
 	if (sharp) {
 		note = "AABCCDDEFFGG"[num % 12];
@@ -16,7 +16,7 @@ export function number_to_note (num, sharp) {
 	return note + octave;
 }
 
-function bit_count (num) {
+function bit_count(num) {
 	let count = 0;
 	while (num) {
 		num &= num - 1;
@@ -25,39 +25,39 @@ function bit_count (num) {
 	return count;
 }
 
-export function white_keys_up_to (num) {
+export function white_keys_up_to(num) {
 	const octaves = num / 12 | 0;
-  const white_keys_in_octaves = octaves * 7;
+	const white_keys_in_octaves = octaves * 7;
 	const white_keys_in_remainder = bit_count(matches(num, 12, 0b1011_0101_1010));
-	
+
 	return white_keys_in_octaves + white_keys_in_remainder;
 }
 
-export function number_to_letter (num) {
+export function number_to_letter(num) {
 	return "ABBCDDEEFGGA"[num % 12];
 }
 
-export function white_key_index (letter) {
+export function white_key_index(letter) {
 	return "CDEFGAB".indexOf(letter);
 }
 
-export function white_key_index_to_letter (index) {
+export function white_key_index_to_letter(index) {
 	return "CDEFGAB"[index];
 }
 
-export function white_key_index_to_note_index (index) {
+export function white_key_index_to_note_index(index) {
 	return [3, 5, 7, 8, 10, 12, 14][index];
 }
 
-export function number_is_natural (num) {
+export function number_is_natural(num) {
 	return (0b10110101101 & 1 << num % 12) > 0;
 }
 
-export function number_is_flat_or_sharp (num) {
+export function number_is_flat_or_sharp(num) {
 	return (0b101001010010 & 1 << num % 12) > 0; // 2642
 }
 
-export function note_to_number (note) {
+export function note_to_number(note) {
 	let letter = note.slice(0, -1).toLowerCase();
 	let octave = +note.at(-1);
 	if (isNaN(octave)) throw "Invalid argument";
@@ -107,4 +107,12 @@ export function note_to_number (note) {
 	}
 	if (num < 0 || num > 87) throw "Invalid argument";
 	return num;
+}
+
+export function shift(note, shift) {
+	let letter = note.slice(0, -1);
+	let octave = +note.at(-1) + shift;
+	if (octave < 0) octave = 0;
+	if (octave > 8) octave = 8;
+	return `${letter}${octave}`
 }
