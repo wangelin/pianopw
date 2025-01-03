@@ -1,10 +1,10 @@
 <script>
-	import '../app.css';
-	import App from './App.svelte';
+	import "../app.css";
+	import App from "./App.svelte";
 </script>
 
 <svelte:boundary>
-	<<App /> />
+	<App />
 
 	{#snippet failed(error)}
 		<p>Oops! {error.message}</p>
