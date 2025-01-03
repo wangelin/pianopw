@@ -52,6 +52,7 @@
 	let hand_held = $state();
 
 	function onpointerup(event) {
+		if (event.target === canvas) event.preventDefault();
 		const playing_note = playing_notes.get(event.pointerId);
 		playing_notes.delete(event.pointerId);
 		if (!sustain) stop(playing_note);
@@ -123,9 +124,9 @@
 	};
 
 	async function onpointerdown(event) {
-		if (event.target !== canvas) {
-			return;
-		}
+		if (event.target === canvas) event.preventDefault();
+		else return;
+
 		if (onpointerdownonce) {
 			await onpointerdownonce();
 		}
@@ -147,6 +148,7 @@
 	}
 
 	function onpointermove(event) {
+		if (event.target === canvas) event.preventDefault();
 		if (!playing_notes.get(event.pointerId)) return;
 		const rect = canvas.getBoundingClientRect();
 		const x = event.clientX - rect.left;
