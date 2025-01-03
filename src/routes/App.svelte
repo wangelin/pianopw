@@ -31,12 +31,10 @@
 	let dark_keys = $state(true);
 	let rows = $state(1);
 	let n_low = $state(note_to_number("C2"));
-	let low_key = $derived(number_to_letter(n_low));
 	let n_low_white = $derived(
 		n_low - (number_is_flat_or_sharp(n_low) ? 1 : 0),
 	);
 	let n_high = $state(note_to_number("C6"));
-	let high_key = $derived(number_to_letter(n_high)); // 88
 	let n_high_white = $derived(
 		n_high + (number_is_flat_or_sharp(n_high) ? 1 : 0),
 	);
@@ -84,7 +82,7 @@
 		const internal_x = (x - clicked_col * key_width) / key_width;
 		const internal_y = (y - clicked_row * key_height) / key_height;
 		const clicked_pos = clicked_row * white_keys_per_row + clicked_col;
-		const white_key_offset = white_key_index(low_key);
+		const white_key_offset = white_key_index(number_to_letter(n_low_white));
 		const note_offset = white_key_index_to_note_index(white_key_offset);
 		const octaves = ((clicked_pos + white_key_offset) / 7) | 0;
 		const clicked_note_index =

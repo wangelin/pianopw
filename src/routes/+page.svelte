@@ -3,4 +3,10 @@
 	import App from './App.svelte';
 </script>
 
-<App />
+<svelte:boundary>
+	<<App /> />
+
+	{#snippet failed(error)}
+		<p>Oops! {error.message}</p>
+	{/snippet}
+</svelte:boundary>
