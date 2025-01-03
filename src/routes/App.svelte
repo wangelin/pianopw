@@ -22,7 +22,7 @@
 	import { point_inside_polygon } from "./math.js";
 	import { create_sampler } from "./piano.js";
 
-	let sampler, play;
+	let sampler, play, stop;
 
 	let octave_shift = $state(0);
 	let show_text = $state(false);
@@ -47,32 +47,13 @@
 	let canvas = $state();
 
 	let status = $state("");
-	let playing_note = $state("");
+	let playing_notes = $state(new Map());
 	let hand_held = $state();
 
-	let timeout;
-	$effect(() => {
-		try {
-			if (playing_note) {
-				if (sustain) {
-					timeout = setTimeout(() => (playing_note = ""), 15_000);
-				}
-			} else {
-				sampler.releaseAll();
-			}
-		} catch {}
-		return () => {
-			if (timeout) {
-				clearTimeout(timeout);
-			}
-		};
-	});
-
-	let pointerdown = $state(false);
-	function onpointerup() {
-		pointerdown = false;
-		if (sustain) return;
-		playing_note = "";
+	function onpointerup(event) {
+		const playing_note = playing_notes.get(event.pointerId);
+		playing_notes.delete(event.pointerId);
+		if (!sustain) stop(playing_note);
 	}
 
 	function get_note(rect, x, y) {
@@ -144,7 +125,6 @@
 		if (onpointerdownonce) {
 			await onpointerdownonce();
 		}
-		pointerdown = true;
 		try {
 			sampler.releaseAll();
 		} catch {}
@@ -153,16 +133,15 @@
 		const y = event.clientY - rect.top;
 		let current_note = get_note(rect, x, y);
 		if (sustain) {
-			if (current_note === playing_note) {
-				pointerdown = false;
-				playing_note = "";
+			if (playing_notes.get(event.pointerId) === current_note) {
+				playing_notes.set(event.pointerId, "");
 			} else {
-				playing_note = current_note;
-				play(shift(playing_note, octave_shift));
+				playing_notes.set(event.pointerId, current_note);
+				play(shift(current_note, octave_shift));
 			}
 		} else {
-			playing_note = current_note;
-			play(shift(playing_note, octave_shift));
+			playing_notes.set(event.pointerId, current_note);
+			play(shift(current_note, octave_shift));
 		}
 	}
 
@@ -172,9 +151,12 @@
 		const y = event.clientY - rect.top;
 
 		let current_note = get_note(rect, x, y);
-		if (current_note && current_note !== playing_note) {
-			playing_note = current_note;
-			play(shift(playing_note, octave_shift));
+		if (
+			current_note &&
+			current_note !== playing_notes.get(event.pointerId)
+		) {
+			playing_notes.set(event.pointerId, current_note);
+			play(shift(current_note, octave_shift));
 		}
 	}
 
@@ -186,7 +168,7 @@
 			while (id--) window.cancelAnimationFrame(id);
 		}
 		cancel_all_animation_frames();
-		({ sampler, play } = create_sampler(Tone));
+		({ sampler, play, stop } = create_sampler(Tone));
 		const ctx = canvas.getContext("2d");
 		ctx.imageSmoothingEnabled = true;
 		let frame;
@@ -225,7 +207,8 @@
 								canvas.height / rows,
 								{ text: show_text ? note : "" },
 							);
-							if (note === playing_note) {
+							playing_notes.entries().forEach(([key, value]) => {
+								if (value !== note) return;
 								draw_black_key(
 									ctx,
 									letter,
@@ -235,7 +218,7 @@
 									canvas.height / rows,
 									{ fillStyle: "rgba(255,255,255,0.2)" },
 								);
-							}
+							});
 						}
 						if (k === n_low_white) letter += "0";
 						else if (k === n_high_white) letter += "1";
@@ -263,7 +246,8 @@
 								{ fillStyle: "rgba(0, 0, 0, 20%)" },
 							);
 						}
-						if (note === playing_note) {
+						playing_notes.entries().forEach(([key, value]) => {
+							if (value !== note) return;
 							draw_white_key(
 								ctx,
 								letter,
@@ -273,7 +257,7 @@
 								canvas.height / rows,
 								{ fillStyle: "rgba(0, 0, 0, 10%)" },
 							);
-						}
+						});
 						x += key_width;
 						k++;
 						if (k < n_high_white && number_is_flat_or_sharp(k)) {
@@ -288,7 +272,8 @@
 								canvas.height / rows,
 								{ text: show_text ? note : "" },
 							);
-							if (note === playing_note) {
+							playing_notes.entries().forEach(([key, value]) => {
+								if (value !== note) return;
 								draw_black_key(
 									ctx,
 									letter,
@@ -298,7 +283,7 @@
 									canvas.height / rows,
 									{ fillStyle: "rgba(255,255,255,0.2)" },
 								);
-							}
+							});
 							k++;
 						}
 					}
@@ -316,8 +301,8 @@
 </script>
 
 <svelte:window
-	onpointerup={playing_note ? onpointerup : undefined}
-	onpointermove={pointerdown ? onpointermove : undefined}
+	onpointerup={playing_notes.size > 0 ? onpointerup : undefined}
+	onpointermove={playing_notes.size > 0 ? onpointermove : undefined}
 />
 
 <div class="screen">

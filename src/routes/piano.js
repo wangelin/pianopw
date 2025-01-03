@@ -42,6 +42,13 @@ export function create_sampler(Tone) {
 				if (Tone.context.state === 'suspended') await Tone.context.resume();
 				sampler.releaseAll();
 				sampler.triggerAttack(note);
+				setTimeout(() => sampler.triggerRelease(note), 15_000)
+			} catch { }
+		},
+		async stop(note) {
+			try {
+				if (Tone.context.state === 'suspended') await Tone.context.resume();
+				sampler.triggerRelease(note);
 			} catch { }
 		}
 	}
