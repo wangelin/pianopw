@@ -49,7 +49,7 @@
 	let status = $state("");
 	let playing_note = $state("");
 	let hand_held = $state();
-	let vh = $state();
+	let vh = $state(0);
 
 	let timeout;
 	$effect(() => {
