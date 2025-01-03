@@ -132,7 +132,11 @@
 	}
 
 	let onpointerdownonce = async () => {
-		await Tone.start();
+		try {
+			await Tone.start();
+		} catch (error) {
+			status = error.message;
+		}
 		onpointerdownonce = undefined;
 	};
 
@@ -427,6 +431,10 @@
 			<input type="checkbox" bind:checked={dark_keys} />
 			<span>Dark</span>
 		</label>
+
+		{#if status}
+			<span>{status}</span>
+		{/if}
 	</div>
 </div>
 
