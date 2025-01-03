@@ -1,6 +1,9 @@
+let logger_instance = null;
+
 export function create_logger() {
+	if (logger_instance) return logger_instance;
 	let _on = false;
-	return {
+	logger_instance = {
 		get on() { return _on; },
 		set on(value) { _on = value; },
 		off() {
@@ -11,4 +14,6 @@ export function create_logger() {
 			console.log(...args)
 		}
 	}
+
+	return logger_instance;
 }

@@ -1,4 +1,8 @@
-export function draw_shape (ctx, width, height, x, y, moves) {
+import { create_logger } from "./logger.js";
+
+const logger = create_logger()
+
+export function draw_shape(ctx, width, height, x, y, moves) {
 	if (moves.length < 1) return;
 	ctx.beginPath();
 	let move = moves[0];
@@ -23,13 +27,14 @@ black_key_shapes.Eb = black_key_shapes.E;
 black_key_shapes.Gb = black_key_shapes.G;
 black_key_shapes.Ab = black_key_shapes.A;
 
-export function draw_black_key (ctx, shape, x, y, width, height, options) {
+export function draw_black_key(ctx, shape, x, y, width, height, options) {
+	logger.log("draw_black_key");
 	if (!shape in black_key_shapes) throw "Invalid shape!"
 	ctx.fillStyle = options?.fillStyle ?? 'black';
 	ctx.strokeStyle = options?.strokeStyle ?? 'black';
-	
+
 	draw_shape(ctx, width, height, x, y, black_key_shapes[shape])
-	
+
 	ctx.fill();
 	ctx.stroke();
 	if (options?.text) {
@@ -66,13 +71,14 @@ export const white_key_shapes = {
 	B0: [[0, 0], [0, 1], [1, 1], [1, 0]]
 }
 
-export function draw_white_key (ctx, shape, x, y, width, height, options) {
+export function draw_white_key(ctx, shape, x, y, width, height, options) {
+	logger.log("draw_white_key");
 	if (!shape in white_key_shapes) throw "Invalid shape!"
 	ctx.fillStyle = options?.fillStyle ?? 'white';
 	ctx.strokeStyle = options?.strokeStyle ?? 'black';
-	
+
 	draw_shape(ctx, width, height, x, y, white_key_shapes[shape]);
-	
+
 	ctx.fill();
 	if (options?.lineWidth) {
 		ctx.lineWidth = options.lineWidth;
