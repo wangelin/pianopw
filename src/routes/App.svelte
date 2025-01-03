@@ -49,7 +49,6 @@
 	let status = $state("");
 	let playing_note = $state("");
 	let hand_held = $state();
-	let vh = $state(0);
 
 	let timeout;
 	$effect(() => {
@@ -319,12 +318,9 @@
 <svelte:window
 	onpointerup={playing_note ? onpointerup : undefined}
 	onpointermove={pointerdown ? onpointermove : undefined}
-	onresize={() => {
-		vh = window.innerHeight * 0.01;
-	}}
 />
 
-<div class="screen" style="--vh: {vh}px;">
+<div class="screen">
 	<div class="canvas-container">
 		<canvas
 			bind:this={canvas}
@@ -480,8 +476,7 @@
 	div.screen {
 		display: grid;
 		grid-template-rows: 1fr auto;
-		min-height: 100vh;
-		height: var(--vh, 100vh);
+		height: 100%;
 		width: 100%;
 		overflow: hidden;
 	}
