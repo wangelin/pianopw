@@ -56,7 +56,7 @@
 		if (event.target === canvas) event.preventDefault();
 		const playing_note = playing_notes.get(event.pointerId);
 		playing_notes.delete(event.pointerId);
-		if (!sustain) stop(playing_note);
+		if (!sustain) stop(shift(playing_note, octave_shift));
 	}
 
 	function get_note(rect, x, y) {
@@ -134,17 +134,17 @@
 		const rect = canvas.getBoundingClientRect();
 		const x = event.clientX - rect.left;
 		const y = event.clientY - rect.top;
-		let current_note = shift(get_note(rect, x, y), octave_shift);
+		let current_note = get_note(rect, x, y);
 		if (sustain) {
 			if (playing_notes.get(event.pointerId) === current_note) {
 				playing_notes.set(event.pointerId, "");
 			} else {
 				playing_notes.set(event.pointerId, current_note);
-				play(current_note);
+				play(shift(current_note, octave_shift));
 			}
 		} else {
 			playing_notes.set(event.pointerId, current_note);
-			play(current_note);
+			play(shift(current_note, octave_shift));
 		}
 	}
 
@@ -155,13 +155,13 @@
 		const x = event.clientX - rect.left;
 		const y = event.clientY - rect.top;
 
-		let current_note = shift(get_note(rect, x, y), octave_shift);
+		let current_note = get_note(rect, x, y);
 		if (
 			current_note &&
 			current_note !== playing_notes.get(event.pointerId)
 		) {
 			playing_notes.set(event.pointerId, current_note);
-			play(current_note);
+			play(shift(current_note, octave_shift));
 		}
 	}
 
